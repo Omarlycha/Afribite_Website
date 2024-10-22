@@ -20,22 +20,22 @@ const OrderNotification = ({orderStatus, orderTime, customerName, orderName, ord
         switch(orderStatus.toLowerCase()) {
             case 'new':
                 return (
-                    <div className='flex flex-row flex-grow'>
+                    <div className='flex'>
                         <p className='truncate'>{customerName} has placed an order for: {orderName}</p>
                         <p>£{orderPrice}</p>
                     </div>
                 )
             case 'ongoing':
                 return (
-                    <div className='grid-cols-2'>
+                    <div className='flex'>
                         <p className='truncate'>{customerName}'s order is being prepared: {orderName}</p>
-                        <p>£{orderPrice}</p>
+                        <p class>£{orderPrice}</p>
                     </div>
                 )
             case 'delivered':
                 return (
-                    <div className='grid-cols-2'>
-                        <p className='truncate'>{customerName}'s order has been delivered at:{deliveryTime}</p>
+                    <div className='flex'>
+                        <p className='truncate'>{customerName}'s order has been delivered at: {deliveryTime}</p>
                         <p>£{orderPrice}</p>
                     </div>
                 );
