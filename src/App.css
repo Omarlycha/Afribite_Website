@@ -997,10 +997,6 @@ a.active > div{
   height: 4rem;
 }
 
-.h-2{
-  height: 0.5rem;
-}
-
 .h-2\.5{
   height: 0.625rem;
 }
@@ -1031,10 +1027,6 @@ a.active > div{
 
 .h-\[100px\]{
   height: 100px;
-}
-
-.h-\[1rem\]{
-  height: 1rem;
 }
 
 .h-\[480px\]{
@@ -1074,6 +1066,14 @@ a.active > div{
   height: 100vh;
 }
 
+.h-2{
+  height: 0.5rem;
+}
+
+.h-\[1rem\]{
+  height: 1rem;
+}
+
 .max-h-\[90vh\]{
   max-height: 90vh;
 }
@@ -1103,14 +1103,6 @@ a.active > div{
   width: 2.5rem;
 }
 
-.w-12{
-  width: 3rem;
-}
-
-.w-14{
-  width: 3.5rem;
-}
-
 .w-16{
   width: 4rem;
 }
@@ -1135,20 +1127,12 @@ a.active > div{
   width: 9rem;
 }
 
-.w-4{
-  width: 1rem;
-}
-
 .w-40{
   width: 10rem;
 }
 
 .w-5{
   width: 1.25rem;
-}
-
-.w-5\/6{
-  width: 83.333333%;
 }
 
 .w-6{
@@ -1210,6 +1194,22 @@ a.active > div{
 
 .w-full{
   width: 100%;
+}
+
+.w-12{
+  width: 3rem;
+}
+
+.w-14{
+  width: 3.5rem;
+}
+
+.w-4{
+  width: 1rem;
+}
+
+.w-5\/6{
+  width: 83.333333%;
 }
 
 .min-w-0{
