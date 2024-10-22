@@ -1,8 +1,8 @@
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
 const data = [
-  { name: 'Group A', value: 400 },
-  { name: 'Group B', value: 300 },
+  { name: 'Group A', value: 0 },
+  { name: 'Group B', value: 100 },
 ];
 const COLORS = ['#808000', '#E2725B'];
 

@@ -30,67 +30,76 @@ import { AuthProvider } from "./context/AuthenticationContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProfileContextProvider from "./context/ProfileContext";
 import CategoryMenuForm from "./pages/CategoryMenuForm";
+import MenuContext from "./context/MenuContext";
 
 function App() {
   return (
     <AuthProvider>
       <ProfileContextProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/home" element={<Homepage />}></Route>
-            <Route element={<MainLayout />}>
-              <Route path="/" element={<LandingPage />} />
-              {/* Other routes that needs the navbar can be nested here if needed */}
-            </Route>
-            <Route path="/user-sign-up" element={<UserSignUp />} />
-            <Route path="/review" element={<Review />}></Route>
-            <Route path="/rating" element={<Rating />}></Route>
-            <Route path="/leave-a-review" element={<LeaveReview />}></Route>
-            <Route
-              path="/Adminhome/*"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Routes>
-                      <Route path="/Dashboard" element={<Dashboard />}></Route>
-                      <Route path="/Profile" element={<Profile />}></Route>
-                      <Route path="/Advert" element={<Advert />}></Route>
-                      <Route
-                        path="/Promotions"
-                        element={<Promotions />}
-                      ></Route>
-                      <Route
-                        path="/CreateMenu"
-                        element={<CreateMenu />}
-                      ></Route>
-                      <Route path="/MenuForm" element={<MenuForm />}></Route>
-                      <Route
-                        path="/Notifications"
-                        element={<Notifications />}
-                      ></Route>
-                      <Route path="/MainDish" element={<MainDish />}></Route>
-                      <Route path="/Appetizer" element={<Appetizer />}></Route>
-                      <Route path="/Side" element={<Side />}></Route>
-                      <Route path="/Soup" element={<Soup />}></Route>
-                      <Route path="/Salad" element={<Salad />}></Route>
-                      <Route path="/Special" element={<Special />}></Route>
-                      <Route path="/Beverage" element={<Beverage />}></Route>
-                      <Route path="/Dessert" element={<Dessert />}></Route>
-                      <Route path="/EditMenu" element={<EditMenu />}></Route>
-                      <Route
-                        path="/CategoryMenuForm"
-                        element={<CategoryMenuForm />}
-                      ></Route>
-                    </Routes>
-                  </Layout>
-                </ProtectedRoute>
-              }
-            ></Route>
+        <MenuContext>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/home" element={<Homepage />}></Route>
+              <Route element={<MainLayout />}>
+                <Route path="/" element={<LandingPage />} />
+                {/* Other routes that needs the navbar can be nested here if needed */}
+              </Route>
+              <Route path="/user-sign-up" element={<UserSignUp />} />
+              <Route path="/review" element={<Review />}></Route>
+              <Route path="/rating" element={<Rating />}></Route>
+              <Route path="/leave-a-review" element={<LeaveReview />}></Route>
+              <Route
+                path="/Adminhome/*"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Routes>
+                        <Route
+                          path="/Dashboard"
+                          element={<Dashboard />}
+                        ></Route>
+                        <Route path="/Profile" element={<Profile />}></Route>
+                        <Route path="/Advert" element={<Advert />}></Route>
+                        <Route
+                          path="/Promotions"
+                          element={<Promotions />}
+                        ></Route>
+                        <Route
+                          path="/CreateMenu"
+                          element={<CreateMenu />}
+                        ></Route>
+                        <Route path="/MenuForm" element={<MenuForm />}></Route>
+                        <Route
+                          path="/Notifications"
+                          element={<Notifications />}
+                        ></Route>
+                        <Route path="/MainDish" element={<MainDish />}></Route>
+                        <Route
+                          path="/Appetizer"
+                          element={<Appetizer />}
+                        ></Route>
+                        <Route path="/Side" element={<Side />}></Route>
+                        <Route path="/Soup" element={<Soup />}></Route>
+                        <Route path="/Salad" element={<Salad />}></Route>
+                        <Route path="/Special" element={<Special />}></Route>
+                        <Route path="/Beverage" element={<Beverage />}></Route>
+                        <Route path="/Dessert" element={<Dessert />}></Route>
+                        <Route path="/EditMenu" element={<EditMenu />}></Route>
+                        <Route
+                          path="/CategoryMenuForm"
+                          element={<CategoryMenuForm />}
+                        ></Route>
+                      </Routes>
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              ></Route>
 
-            <Route path="/Sign-up/" element={<SignUpForm />}></Route>
-            <Route path="/Sign-in/" element={<SignInForm />}></Route>
-          </Routes>
-        </BrowserRouter>
+              <Route path="/Sign-up/" element={<SignUpForm />}></Route>
+              <Route path="/Sign-in/" element={<SignInForm />}></Route>
+            </Routes>
+          </BrowserRouter>
+        </MenuContext>
       </ProfileContextProvider>
     </AuthProvider>
   );

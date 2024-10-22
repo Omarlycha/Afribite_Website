@@ -41,9 +41,10 @@ const Profile = () => {
       useEffect(() => {
         if (user) {
             fetchUserData();
+            const fetchImgUrl = async () => {
+              
+            }
         }
-
-      console.log(profileForm)
     }, []);
 
   const handleChange = (e) => {
@@ -58,20 +59,16 @@ const Profile = () => {
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
+      setProfileForm(prevProfile => ({
+        ...prevProfile,
+        profileImage: file
+    }))
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
       };
       
       reader.readAsDataURL(file);
-        const storage = getStorage();
-        const storageRef = ref(storage, `profileImages/${user.uid}`);
-        await uploadBytes(storageRef, file);
-        const downloadURL = await getDownloadURL(storageRef);
-        setProfileForm(prevProfile => ({
-            ...prevProfile,
-            profileImage: downloadURL
-        }));
     }
 };
 
@@ -80,7 +77,22 @@ const Profile = () => {
     try {
       setLoading(true)
       const db = getFirestore();
-      await setDoc(doc(db, 'users', user.uid), profileForm);
+      const storage = getStorage();
+
+      let downloadURL = null
+
+      if (profileForm.profileImage) {
+        if (typeof profileForm.profileImage !== 'object' ) {
+          downloadURL = profileForm.profileImage
+        } else {
+          const storageRef = ref(storage, `profileImages/${user.uid}`)
+          await uploadBytes(storageRef, profileForm.profileImage);
+           downloadURL  = await getDownloadURL(storageRef);
+        }
+      }
+
+      await setDoc(doc(db, 'users', user.uid),{ ...profileForm, profileImage: downloadURL}, );
+
       fetchUserProfile()
       setLoading(false)
        
@@ -91,6 +103,7 @@ const Profile = () => {
       }
   
       notify() 
+   
     } 
     catch (error) {
       setLoading(false)
@@ -126,7 +139,7 @@ const Profile = () => {
            <div className="flex items-end mt-2 ">
               <div className={`w-36 h-36 flex items-center ${imagePreview ? '' : 'p-4'}  bg-white justify-center border-2 rounded-full overflow-hidden `}>
               {imagePreview ? (
-              <img src={imagePreview} alt="Preview" className="w-fit h-fit rounded-full m-auto " />
+              <img src={imagePreview} alt="Preview" className="rounded-full m-auto " />
             ) : (
               <FiImage className="text-5xl text-n-n3" />
             )}
@@ -157,7 +170,7 @@ const Profile = () => {
             type="text" 
             className="border-2 bg-inherit border-[#E2725B]/20 w-full p-2 rounded-lg focus:outline-none focus:border-[#E2725B] "/>
 
-            <p className="mt-4 font-semibold text-[#E2725B]">Reasutrant name</p>
+            <p className="mt-4 font-semibold text-[#E2725B]">Resautrant name</p>
             <input
             name="restuarantName"
             value={profileForm.restuarantName}

@@ -58,7 +58,7 @@ function Special() {
   return (
     <div>
       <div className="my-4 mx-auto py-6 lg:p-6 lg:mx-auto w-[90%] md:w-[30rem] lg:w-[48rem] bg-n-n6 rounded-sm grid place-items-center shadow-md">
-        <h2 className="mb-8">spacial</h2>
+        <h2 className="mb-8">Special</h2>
 
         <div className="flex justify-between items-center">
           <div>

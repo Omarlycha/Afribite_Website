@@ -77,17 +77,17 @@ Afribite is an innovative food delivery platform that focuses on promoting Afric
 - Added delete popup diagram to edit menu page, to enable users to delete menu items
 - connect landing Page to admin page (if user exist they are directed to the admin dashboard, else they are directed to the signup page)
 - handle admin logout (to log out admin user from admin dashboard)
+- Created menu context to get all menu data created by a authenticated user.
+- Added menu context to dashboard to generate admin total available dish.
 
 ### Magali Lapu
 
 - Built orders notifications system for Afribite.
 - Created tab filtering for order notifications
 - Created order notification tile components
-- Created order details popup  component
-- Created order search  component
+- Created order details popup component
+- Created order search component
 - Integrated firebase data
-
-
 
 ## Team 5 Contribution
 
@@ -116,6 +116,7 @@ Afribite is an innovative food delivery platform that focuses on promoting Afric
 - Added function to fetch and edit user Profile on profile page from firebase
 - Created CustomerChart, PointChart and ViewerChart component to display data graphically
 - Added date range to the choicedate component for choosing date
+- Created progress bar for adss and promotion on dashboard
 
 ### Ogwo Ijeoma Precious Chidinma
 

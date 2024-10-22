@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { getFirestore, collection, addDoc, getDocs, query, orderBy, deleteDoc, doc } from "firebase/firestore";
+import { getFirestore, collection, addDoc, deleteDoc, doc } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Banner from "../components/Banner";
-import Button from "../components/button";
 import { FiImage } from "react-icons/fi";
 import Category from "../components/ui/Category";
 import ChoiceDate from "../components/ui/DatePicker";
@@ -35,11 +34,11 @@ const throttle = (func, limit) => {
 }
 
 const Promotions = () => {
-  const { adForm, setAdForm } = useContext(profileContext);
+  const { adForm, setAdForm, promotions,fetchPromotions, } = useContext(profileContext);
   const { user } = useAuth();
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showPromotions, setShowPromotions] = useState(false);
-  const [promotions, setPromotions] = useState([]);
+
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -127,26 +126,6 @@ const Promotions = () => {
     }));
     setTermsAccepted(false);
   }, [setAdForm]);
-
-  const fetchPromotions = useCallback(async () => {
-    if (!user) return;
-
-    try {
-      const db = getFirestore();
-      const promotionsRef = collection(db, "promotions", user.uid, "promotionData");
-      const q = query(promotionsRef, orderBy("createdAt", "desc"));
-      const querySnapshot = await getDocs(q);
-      const promotionsData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate() 
-      }));
-      setPromotions(promotionsData);
-    } catch (error) {
-      console.error("Error fetching promotions: ", error);
-      toast.error("Error fetching promotions. Please try again.");
-    }
-  }, [user]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

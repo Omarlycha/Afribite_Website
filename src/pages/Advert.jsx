@@ -4,14 +4,14 @@ import { FiImage } from "react-icons/fi";
 import { LuPoundSterling } from "react-icons/lu";
 import { ChoiceDate } from "../components/ui/DatePicker";
 import { Link} from "react-router-dom";
-import { getFirestore, collection, addDoc, getDocs } from "firebase/firestore";
+import { getFirestore, collection, addDoc } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
 import { toast, ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "../context/AuthenticationContext";
 import { profileContext } from "../context/ProfileContext";
 import LoadingButton from "../components/LoadingButton";
-
+import { v4 as uuidv4 } from "uuid";
 
 
 const Advert = () => {
@@ -24,9 +24,11 @@ const Advert = () => {
     setAdEndDate, 
     adImagePreview, 
     setAdImagePreview,
+    userAdData, 
+    fetchUserAdData,
+    handleDeletePromotion
   } = useContext(profileContext)
   const {user} = useAuth()
-  const [userAdData, setUserAdData] = useState([]);  // State to store user data
   const [loading, setLoading] = useState(false); 
   const [showAds, setShowAds] = useState(false);
 
@@ -57,6 +59,33 @@ const Advert = () => {
     }
   };
 
+  const formatNumber = (num) => {
+    // Remove all commas and non-numeric characters first
+    let number = num.replace(/,/g, "");
+    // Return formatted number with commas
+    return number.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  // Handle input change
+  const handleNumChange = (e) => {
+    const inputValue = e.target.value;
+    if (/^\d*$/.test(inputValue.replace(/,/g, ""))) {
+      const inputValue = e.target.value;
+      // Only allow numbers and commas
+      const formattedValue = formatNumber(inputValue);
+      setAdForm((prev)=>(
+        {...prev,
+          budget : formattedValue
+        }
+      ))
+    }
+  };
+
+  // Remove commas before form submission
+  const removeCommas = (num) => {
+    return num.replace(/,/g, "");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -66,7 +95,7 @@ const Advert = () => {
 
       let imageUrl = null;
       if (adForm.image) {
-        const storageRef = ref(storage, `adverts/${adForm.image.name}`);
+        const storageRef = ref(storage, `adverts/${user.uid}/${adForm.image.name + uuidv4()}`);
         await uploadBytes(storageRef, adForm.image);
         imageUrl = await getDownloadURL(storageRef);
       }
@@ -78,9 +107,10 @@ const Advert = () => {
         description : adForm.Description,
         image : imageUrl,
         audience : adForm.audience,
-        budget: adForm.budget,
+        budget: removeCommas(adForm.budget),
         startDate: adStartDate.toISOString(),
         endDate: adEndDate.toISOString(),
+        createdAt: new Date()
       } )
 
       setLoading(false)
@@ -119,30 +149,6 @@ const Advert = () => {
   };
 
 
-  const fetchUserData = async () => {
-    try {
-      if (user) {
-        const db = getFirestore();
-        // Reference the "advertData" subcollection under the user's document
-        const userSubcollectionRef = collection(db, 'adverts', user.uid, 'advertData');
-        
-        // Fetch all documents from the subcollection
-        const querySnapshot = await getDocs(userSubcollectionRef);
-        
-        // Extract data from each document
-        const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        
-        // Update state with the fetched data
-        setUserAdData(data);
-        ;
-      }
-    } catch (error) {
-      console.error("Error fetching user data: ", error);
-      setLoading(false);
-    }
-  };
-
-
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}`;
@@ -166,11 +172,12 @@ const Advert = () => {
   }
 
   useEffect(()=>{
-    fetchUserData();
+    fetchUserAdData();
     setAdEndDate(
       adStartDate
     )
-  },[adStartDate])
+    console.log(adForm)
+  },[adStartDate, adForm])
 
 
   return (
@@ -191,16 +198,19 @@ const Advert = () => {
             <p className="mt-4 font-semibold text-[#E2725B]">Ad title</p>
             <input
             required
+            maxLength={50}
+            placeholder="max 50 characters"
             name="Title"
             value={adForm.Title}
             onChange={handleChange}
             type="text" 
-            className="border-2 bg-inherit border-[#E2725B]/20 w-full p-2 rounded-lg focus:outline-none focus:border-[#E2725B] "/>
+            className="border-2 bg-inherit border-[#E2725B]/20 w-full p-2 rounded-lg focus:outline-none focus:border-[#E2725B] placeholder:text-[#E2725B]/40 placeholder:p-1 "/>
 
             <p className="mt-4 font-semibold text-[#E2725B] ">Description</p>
             <textarea
             required
-            placeholder="Write a detailed description about your Ad" 
+            maxLength={250}
+            placeholder="Write a detailed description about your Ad with max 250 characters" 
             name="Description"
             value={adForm.Description}
             onChange={handleChange}
@@ -209,7 +219,7 @@ const Advert = () => {
             className="border-2 bg-inherit border-[#E2725B]/20 w-full p-2 rounded-lg focus:outline-none focus:border-[#E2725B] placeholder:text-[#E2725B]/40 placeholder:p-1"></textarea>
 
         <p className="mt-4 font-semibold text-[#E2725B] ">Upload image</p>
-        <div className="flex gap-4 items-center p-4 bg-white justify-center border-2 border-dashed">
+        <div className="flex flex-col md:flex-row gap-4 items-center p-4 bg-white justify-center border-2 border-dashed">
         {adImagePreview ? (
               <img src={adImagePreview} alt="Preview" className="w-32 h-32 object-cover" />
             ) : (
@@ -218,14 +228,17 @@ const Advert = () => {
           <p className="">
             Upload an image for your restaurant banner (GIF,JPG or PNG){" "}
           </p>
+          <div className="relative">
+          <label htmlFor="file" className="absolute text-center sm:left-0 w-20 text-white text-xs lg:text-sm border-2 bg-p-button p-3 rounded-md font-pop hover:border-p-button hover:text-p-button hover:bg-n-n7">Browse</label>
           <input
             required
             id="file"
             type="file"
             accept="image/png, image/gif, image/jpeg"
-            className=" min-w-0 max-w-32 text-white file:hidden text-xs lg:text-sm border-2 bg-p-button p-3 rounded-md font-pop hover:border-p-button hover:text-p-button hover:bg-n-n7"
+            className=" w-20 text-white file:hidden text-xs lg:text-sm border-2 bg-p-button p-3 rounded-md font-pop hover:border-p-button hover:text-p-button hover:bg-n-n7"
             onChange={handleImageChange}
           />
+          </div>
         </div>
 
         <div className="flex flex-col md:flex-row justify-between text-sm md:text-base md:mt-4 md:px-3 ">
@@ -233,12 +246,12 @@ const Advert = () => {
           <p className="mt-4 font-semibold text-[#E2725B]">Audience</p>
 
           <div className="mt-2">
-          <div className="flex gap-2 ">
-          <input required name="audience" type="radio" value='everybody' checked={adForm.audience === 'everybody'} onChange={handleChange} /> <p className="text-[#E2725B]">Everyone</p>
+          <div className="flex gap-2 items-center ">
+          <input required name="audience" type="radio" value='everybody' checked={adForm.audience === 'everybody'} onChange={handleChange} className={`appearance-none p-2 border-2 border-[#E2725B]/40 my-1 ${adForm.audience === 'everybody' ? 'bg-p-button': ''}`} /> <p className="text-[#E2725B]">Everyone</p>
           </div>
           
-          <div className="flex gap-2">
-          <input required  name="audience" type="radio" value='newcomers' checked={adForm.audience === 'newcomers'} onChange={handleChange} /> <p className="text-[#E2725B]">Newcomers</p>
+          <div className="flex gap-2 items-center">
+          <input required  name="audience" type="radio" value='newcomers' checked={adForm.audience === 'newcomers'} onChange={handleChange} className={`appearance-none p-2 border-2 border-[#E2725B]/40 my-1 ${adForm.audience === 'newcomers' ? 'bg-p-button': ''}`}/> <p className="text-[#E2725B]">Newcomers</p>
           </div>
           </div>
             
@@ -252,8 +265,8 @@ const Advert = () => {
               required
               name="budget"
               value={adForm.budget}
-              onChange={handleChange}
-              type="number" 
+              onChange={handleNumChange}
+              type="" 
               className="border-2 bg-inherit border-[#E2725B]/20 w-full pl-6 p-2 rounded-lg focus:outline-none focus:border-[#E2725B] "/>     
             </div>
           </div>
@@ -263,7 +276,7 @@ const Advert = () => {
         <div className="flex flex-col md:flex-row gap-5 md:gap-0 justify-between text-sm md:text-base mt-4  ">
               <span>
                  <h3 className="text-[#E2725B] font-semibold">Start date</h3>
-                 <ChoiceDate value={adStartDate} onChange={setAdStartDate} />
+                 <ChoiceDate value={adStartDate} onChange={setAdStartDate} minDate={new Date()} />
               </span>
 
               <span >
@@ -278,7 +291,7 @@ const Advert = () => {
           <button onClick={clearForm} type="button" className="p-3 border-2 text-xs lg:text-sm text-white bg-[#E2725B] rounded-md transition-colors hover:border-[#E2725B] hover:text-[#E2725B] hover:bg-white ">
             Clear form
           </button>
-        <Link to='/Adminhome/Dashboard'><p  className="text-[#E2725B] font-semibold">Cancel</p></Link>
+        <Link to='/Adminhome/Dashboard'><p onClick={clearForm} className="text-[#E2725B] font-semibold">Cancel</p></Link>
         </div>
       </form>
 
@@ -299,8 +312,8 @@ const Advert = () => {
             userAdData.map((ad) => (
               <div key={ad.id} className="mb-4 p-2 bg-white/10 rounded flex">
                 <div className="w-1/4 mr-4">
-                  {ad.imageUrl ? (
-                    <img src={ad.imageUrl} alt={ad.title} className="w-full h-auto object-cover rounded" />
+                  {ad.image ? (
+                    <img src={ad.image} alt={ad.title} className="w-full h-auto object-cover rounded" />
                   ) : (
                     <div className="w-full h-32 bg-gray-200 flex items-center justify-center rounded">
                       <FiImage className="text-gray-400 text-4xl" />
@@ -314,7 +327,13 @@ const Advert = () => {
                   <p> <span className="text-[#E2725B]"> Budget:  </span> {ad.budget}</p>
                   <p> <span className="text-[#E2725B]"> Start Date:  </span> {formatDate(ad.startDate)}</p>
                   <p> <span className="text-[#E2725B]"> End Date:  </span> {formatDate(ad.endDate)}</p>
-                  {/* <p className="text-sm  text-gray-500"> <span className=" text-[#E2725B] ">Created:</span> {userAdData.createdAt.toLocaleString()}</p> */}
+                  <p className="text-sm  text-gray-500"> <span className=" text-[#E2725B] ">Created:</span> {ad.createdAt.toLocaleString()}</p>
+                  <button
+                    onClick={() => handleDeletePromotion(ad.id,'Ad','adverts', 'advertData')}
+                    className="mt-2 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                  >
+                    Delete Ad
+                  </button>
                 </div>
               </div>
             )))}

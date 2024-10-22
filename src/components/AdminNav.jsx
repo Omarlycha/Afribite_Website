@@ -24,7 +24,10 @@ const AdminNav = ({className}) => {
       />
 
       <div className={`flex gap-2 ${location.pathname === '/Adminhome/Profile' ? 'hidden' : ''}` }>
-        <Link to='/Adminhome/Profile'><img src={myProfile?.profileImage ? myProfile?.profileImage : profileImg} alt="" className="m-auto h-[50px] w-[50px] rounded-[100%] bg-[#E2725B]" />
+        <Link to='/Adminhome/Profile'>
+        <div className="h-[50px] w-[50px] flex items-center justify-center m-auto rounded-full overflow-hidden">
+            <img src={myProfile?.profileImage ? myProfile?.profileImage : profileImg} alt="" className=" rounded-full m-auto bg-[#E2725B]" />
+        </div>
         </Link>
           <div className="flex flex-col">
             <p className='text-base hidden md:block'>{myProfile?.restuarantName}</p>
