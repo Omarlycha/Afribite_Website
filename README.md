@@ -134,6 +134,7 @@ Afribite is an innovative food delivery platform that focuses on promoting Afric
 - [Ogwo Ijeoma Precious Chidinma] - Frontend Developer
 - [Magali Lapu] - Frontend Developer
 - [Rhoda Ojetola] - Frontend Developer
+- Chioma Chiekwe - Frontend Developer
 
 ## Links
 
